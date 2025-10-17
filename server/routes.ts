@@ -793,8 +793,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Request not found" });
       }
 
+      // Prevent self-fulfillment - requester cannot fulfill their own request
+      if (existingRequest.requesterId === authReq.user!.id) {
+        return res.status(403).json({ message: "Cannot fulfill your own request" });
+      }
+
       if (existingRequest.status !== "approved") {
         return res.status(400).json({ message: "Only approved requests can be fulfilled" });
+      }
+
+      // Check if product has sufficient quantity
+      const product = await storage.getProduct(existingRequest.productId);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      if (product.quantity < existingRequest.quantity) {
+        return res.status(400).json({ 
+          message: `Insufficient inventory. Available: ${product.quantity}, Requested: ${existingRequest.quantity}` 
+        });
       }
       
       const request = await storage.updateStockOutRequest(id, {

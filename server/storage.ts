@@ -208,6 +208,21 @@ export class DatabaseStorage implements IStorage {
     
     // If request is fulfilled, update product quantity
     if (request.status === "fulfilled" && updated) {
+      // Defensive check: verify product has enough quantity
+      const [product] = await db
+        .select()
+        .from(products)
+        .where(eq(products.id, updated.productId))
+        .limit(1);
+      
+      if (!product) {
+        throw new Error("Product not found");
+      }
+      
+      if (product.quantity < updated.quantity) {
+        throw new Error(`Insufficient inventory. Available: ${product.quantity}, Requested: ${updated.quantity}`);
+      }
+      
       await db
         .update(products)
         .set({

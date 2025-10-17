@@ -1,74 +1,58 @@
 import { Package, AlertTriangle, TrendingUp, Users } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { StatCard } from "@/components/stat-card";
 import { ActivityFeed } from "@/components/activity-feed";
 import { LowStockAlert } from "@/components/low-stock-alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
-
-const mockActivities = [
-  {
-    id: "1",
-    type: "stock-in" as const,
-    user: "John Doe",
-    timestamp: "2 minutes ago",
-    description: "Added 50 units of Wireless Mouse",
-  },
-  {
-    id: "2",
-    type: "approval" as const,
-    user: "Sarah Manager",
-    timestamp: "15 minutes ago",
-    description: "Approved stock request #1234",
-  },
-  {
-    id: "3",
-    type: "stock-out" as const,
-    user: "Mike Staff",
-    timestamp: "1 hour ago",
-    description: "Fulfilled 20 units of USB Cable",
-  },
-  {
-    id: "4",
-    type: "rejection" as const,
-    user: "Sarah Manager",
-    timestamp: "2 hours ago",
-    description: "Rejected stock request #1230",
-  },
-  {
-    id: "5",
-    type: "stock-in" as const,
-    user: "Alice Worker",
-    timestamp: "3 hours ago",
-    description: "Added 100 units of Laptop Stand",
-  },
-];
-
-const chartData = [
-  { month: "Jan", stockIn: 400, stockOut: 240 },
-  { month: "Feb", stockIn: 300, stockOut: 139 },
-  { month: "Mar", stockIn: 200, stockOut: 980 },
-  { month: "Apr", stockIn: 278, stockOut: 390 },
-  { month: "May", stockIn: 189, stockOut: 480 },
-  { month: "Jun", stockIn: 239, stockOut: 380 },
-];
-
-const stockInData = [
-  { name: "Electronics", value: 450 },
-  { name: "Accessories", value: 380 },
-  { name: "Furniture", value: 280 },
-  { name: "Office Supplies", value: 190 },
-];
-
-const stockOutData = [
-  { name: "Electronics", value: 340 },
-  { name: "Accessories", value: 290 },
-  { name: "Furniture", value: 180 },
-  { name: "Office Supplies", value: 120 },
-];
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
 
+interface DashboardStats {
+  totalProducts: number;
+  lowStockCount: number;
+  totalStockValue: number;
+  activeUsers: number;
+}
+
+interface CategoryData {
+  category: string;
+  value: number;
+}
+
+interface Activity {
+  id: string;
+  type: 'stock-in' | 'stock-out' | 'approval' | 'rejection';
+  user: string;
+  timestamp: string;
+  description: string;
+}
+
 export default function Dashboard() {
+  const { data: dashboardStats, isLoading: loadingStats } = useQuery<DashboardStats>({
+    queryKey: ['/api/analytics/dashboard'],
+  });
+
+  const { data: stockInData, isLoading: loadingStockIn } = useQuery<CategoryData[]>({
+    queryKey: ['/api/analytics/stock-in-by-category'],
+  });
+
+  const { data: stockOutData, isLoading: loadingStockOut } = useQuery<CategoryData[]>({
+    queryKey: ['/api/analytics/stock-out-by-category'],
+  });
+
+  const { data: recentActivity, isLoading: loadingActivity } = useQuery<Activity[]>({
+    queryKey: ['/api/analytics/recent-activity'],
+  });
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(value);
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -78,33 +62,51 @@ export default function Dashboard() {
         </p>
       </div>
 
-      <LowStockAlert count={23} onViewDetails={() => console.log("View low stock products")} />
+      {loadingStats ? (
+        <Skeleton className="h-12 w-full" />
+      ) : (
+        dashboardStats && dashboardStats.lowStockCount > 0 && (
+          <LowStockAlert 
+            count={dashboardStats.lowStockCount} 
+            onViewDetails={() => window.location.href = '/products?filter=low-stock'} 
+          />
+        )
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-        <StatCard
-          title="Total Products"
-          value="1,234"
-          icon={Package}
-          trend={{ value: "12% from last month", isPositive: true }}
-        />
-        <StatCard
-          title="Low Stock Alerts"
-          value="23"
-          icon={AlertTriangle}
-          iconColor="text-chart-3"
-        />
-        <StatCard
-          title="Stock Value"
-          value="$125,430"
-          icon={TrendingUp}
-          trend={{ value: "8% from last month", isPositive: true }}
-          iconColor="text-chart-2"
-        />
-        <StatCard
-          title="Active Staff"
-          value="42"
-          icon={Users}
-        />
+        {loadingStats ? (
+          <>
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+          </>
+        ) : (
+          <>
+            <StatCard
+              title="Total Products"
+              value={dashboardStats?.totalProducts?.toLocaleString() || "0"}
+              icon={Package}
+            />
+            <StatCard
+              title="Low Stock Alerts"
+              value={dashboardStats?.lowStockCount?.toString() || "0"}
+              icon={AlertTriangle}
+              iconColor="text-chart-3"
+            />
+            <StatCard
+              title="Stock Value"
+              value={formatCurrency(dashboardStats?.totalStockValue || 0)}
+              icon={TrendingUp}
+              iconColor="text-chart-2"
+            />
+            <StatCard
+              title="Active Users"
+              value={dashboardStats?.activeUsers?.toString() || "0"}
+              icon={Users}
+            />
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -113,32 +115,40 @@ export default function Dashboard() {
             <CardTitle className="text-base">Stock In by Category</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={stockInData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {stockInData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            {loadingStockIn ? (
+              <Skeleton className="h-[280px]" />
+            ) : stockInData && stockInData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={stockInData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {stockInData.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "var(--radius)",
+                    }}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[280px] flex items-center justify-center text-muted-foreground">
+                No stock in data available
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -147,62 +157,65 @@ export default function Dashboard() {
             <CardTitle className="text-base">Stock Out by Category</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie
-                  data={stockOutData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {stockOutData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            {loadingStockOut ? (
+              <Skeleton className="h-[280px]" />
+            ) : stockOutData && stockOutData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={stockOutData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {stockOutData.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "var(--radius)",
+                    }}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[280px] flex items-center justify-center text-muted-foreground">
+                No stock out data available
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-3">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Stock Movement Trend</CardTitle>
+            <CardTitle className="text-base">Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="month" className="text-xs" />
-                <YAxis className="text-xs" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Bar dataKey="stockIn" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="stockOut" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {loadingActivity ? (
+              <div className="space-y-3">
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
+                <Skeleton className="h-16" />
+              </div>
+            ) : recentActivity && recentActivity.length > 0 ? (
+              <ActivityFeed activities={recentActivity} />
+            ) : (
+              <div className="py-8 text-center text-muted-foreground">
+                No recent activity
+              </div>
+            )}
           </CardContent>
         </Card>
-
-        <ActivityFeed activities={mockActivities} />
       </div>
     </div>
   );
