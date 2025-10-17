@@ -1,0 +1,71 @@
+Inventory Management Web Application Development
+Design Guidelines
+
+Use Node.js (e.g. with Express) for the backend, implementing a RESTful API to handle data operations (products, inventory logs, user requests, etc.).
+
+Use HTML5 and CSS3 for the frontend to create a clean, responsive user interface (you may incorporate a UI framework like Bootstrap for faster development).
+
+Implement secure authentication and role-based access control so that only authorized users (admins, managers, warehouse staff, etc.) can access specific features.
+
+Ensure data persistence with a reliable database (MySQL, PostgreSQL, MongoDB, etc.) to store products, inventory logs, users, and reports.
+
+Follow best practices for code organization (e.g. MVC architecture) and maintain a modular, maintainable code structure.
+
+Optimize performance and security (efficient database queries, pagination for large lists, HTTPS, input validation, and safe error handling).
+
+Module Breakdown
+
+Product & Category Management: Provide an interface to add new products or items, update details, and remove items as needed. Include fields such as name, category, vendor, SKU, etc. Maintain an up-to-date product catalog with search and categorization functionality.
+
+Stock-In Module: Enable warehouse staff to log incoming stock with all required details: date and time of receipt, product name/category, quantity received, supplier/vendor, and optional attachments (e.g. invoice photos). Each stock intake should update the inventory count accurately.
+
+Stock-Out & Request Module: Implement a controlled stock-out process for items leaving inventory. A staff member (requester) creates an item request when they need a product. An Inventory Manager reviews and approves the request. Once approved, mark the item as stocked-out with details (date/time, item name, quantity, purpose). After handing over the items, the requester confirms receipt in the system. This workflow ensures proper authorization and maintains an audit trail of all stock-out events.
+
+Real-Time Inventory Dashboard: Provide a dashboard for real-time monitoring of stock levels across all items. Display key metrics such as total items in stock, low-stock alerts, and recent stock-in/stock-out activities. This centralized view should allow managers to see current stock availability at a glance, simplifying audits and daily inventory monitoring.
+
+Reporting & Stock Movement Logs: Include a reporting module to generate analytical reports, for example:
+
+Current Stock Report (snapshot of all inventory quantities by category)
+
+Low Stock Report (items below reorder threshold)
+
+Stock Movement History (detailed log of all stock-in and stock-out transactions over time)
+
+Usage Reports (inventory usage by project or department based on request purposes)
+These reports help management analyze trends, plan procurement, and maintain compliance with audit requirements by providing insight into inventory status and movement.
+
+Dashboard (UI): Create an interactive visual dashboard that shows real-time data. Include charts or graphs for inventory trends, purchase history, and vendor performance. Highlight low-stock alerts and summary statistics in an easy-to-read format.
+
+Product Management (UI): Provide screens to add, edit, and view product details. Implement search and filtering (e.g. filter by product or date) to allow quick lookup and analysis. Display alerts or notifications for items that are low in stock.
+
+Stock Management (UI): Show current stock levels in real time, organized by product or vendor. Include a history view where users can filter and review past stock movements (with date filters) for auditing purposes.
+
+Warehouse Staff Management (UI): Build an interface for managing warehouse personnel accounts. Allow creation of warehouse/shopkeeper profiles and assignment of login credentials. Provide a view to track staff performance (e.g. tasks completed, inventory handled, efficiency metrics).
+
+Role Structure
+
+Administrator: Full access to all system features. Can configure system settings, manage user accounts (create and assign roles for managers and staff), and oversee all operations.
+
+Inventory Manager: Manages inventory operations. Can approve or reject stock-out requests, generate reports, add or edit products, and monitor stock levels. Oversees daily inventory control and ensures data accuracy.
+
+Warehouse Staff (Shopkeeper): Performs day-to-day warehouse tasks. Can log stock-in entries, fulfill approved stock-out requests, and view product and stock information. Does not have administrative privileges.
+
+Employee (Requester): A regular staff member who can create item requests for needed inventory. Can view the status of their requests and confirm receipt of approved items. Cannot directly modify stock levels without approval.
+
+UX Guidance
+
+Intuitive Navigation: Design a clear, easy-to-use menu and layout. Important sections (Dashboard, Products, Stock-In/Out, Reports) should be readily accessible from any page.
+
+Responsive Design: Ensure the interface works well on various devices (desktop, tablet, mobile). Use fluid layouts and scalable elements so content adapts to different screen sizes.
+
+Consistent Styling: Apply a cohesive color scheme, typography, and spacing. Keep the UI clean and uncluttered by grouping related information and using whitespace effectively.
+
+Interactive Feedback: Provide real-time updates where possible (e.g. live inventory counts on the dashboard). Use progress indicators or confirmation dialogs for actions like saving data or approving requests.
+
+Search & Filtering: Include search bars and filters to help users quickly find products or records. This is especially important for managing large inventories.
+
+Visual Alerts: Use color-coded indicators or badges to highlight critical information (e.g. red for low stock, green for sufficient stock). Pop-up or inline notifications can inform users of successful actions or errors.
+
+Accessibility: Follow accessibility best practices (e.g. proper labels for form fields, readable font sizes, high contrast for text) to ensure the app is usable by all users.
+
+Error Handling: Clearly display error messages for invalid input and guide users to correct issues. Validate forms on the client side for basic checks (required fields, numeric ranges) and provide helpful feedback.
