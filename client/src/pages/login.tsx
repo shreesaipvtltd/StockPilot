@@ -22,7 +22,6 @@ export default function Login() {
     password: "",
     fullName: "",
     email: "",
-    role: "employee" as string,
   });
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -147,23 +146,6 @@ export default function Login() {
                       onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                       required
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="register-role">Role</Label>
-                    <Select
-                      value={registerData.role}
-                      onValueChange={(value) => setRegisterData({ ...registerData, role: value })}
-                    >
-                      <SelectTrigger data-testid="select-register-role">
-                        <SelectValue placeholder="Select a role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="employee">Employee</SelectItem>
-                        <SelectItem value="staff">Staff</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="register-password">Password</Label>

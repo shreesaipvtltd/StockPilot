@@ -177,6 +177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: hashedPassword,
       });
 
+      req.session.userId = user.id;
       const { password, ...userWithoutPassword } = user;
       res.status(201).json(userWithoutPassword);
     } catch (error) {

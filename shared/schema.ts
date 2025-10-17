@@ -15,7 +15,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   fullName: text("full_name").notNull(),
-  role: userRoleEnum("role").notNull().default("employee"),
+  role: userRoleEnum("role").notNull().default("staff"),
   email: text("email").notNull().unique(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -140,6 +140,7 @@ export const insertUserSchema = createInsertSchema(users, {
   password: z.string().min(6),
   email: z.string().email(),
   fullName: z.string().min(1),
+  role: z.enum(["admin", "manager", "staff", "employee"]).default("staff"),
 }).pick({
   username: true,
   password: true,

@@ -64,7 +64,7 @@ function Router() {
 }
 
 function AppContent() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const [location] = useLocation();
   
   const style = {
@@ -76,12 +76,16 @@ function AppContent() {
     return <Router />;
   }
 
-  if (!user) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-lg">Loading...</div>
       </div>
     );
+  }
+
+  if (!user) {
+    return <Router />;
   }
 
   return (
