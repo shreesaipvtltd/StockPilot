@@ -12,7 +12,6 @@ import Products from "@/pages/products";
 import StockIn from "@/pages/stock-in";
 import StockOut from "@/pages/stock-out";
 import Reports from "@/pages/reports";
-import Staff from "@/pages/staff";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -23,7 +22,6 @@ function Router() {
       <Route path="/stock-in" component={StockIn} />
       <Route path="/stock-out" component={StockOut} />
       <Route path="/reports" component={Reports} />
-      <Route path="/staff" component={Staff} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -43,11 +41,11 @@ export default function App() {
             <div className="flex h-screen w-full">
               <AppSidebar userRole="admin" />
               <div className="flex flex-col flex-1">
-                <header className="flex items-center justify-between p-4 border-b">
+                <header className="flex items-center justify-between px-4 py-3 border-b">
                   <SidebarTrigger data-testid="button-sidebar-toggle" />
                   <ThemeToggle />
                 </header>
-                <main className="flex-1 overflow-auto p-6">
+                <main className="flex-1 overflow-auto p-4">
                   <Router />
                 </main>
               </div>

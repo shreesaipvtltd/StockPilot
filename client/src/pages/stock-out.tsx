@@ -74,7 +74,7 @@ export default function StockOut() {
   const allRequests = requests;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Stock Out Requests</h1>
@@ -88,7 +88,7 @@ export default function StockOut() {
         </Button>
       </div>
 
-      <Tabs defaultValue="pending" className="space-y-4">
+      <Tabs defaultValue="pending" className="space-y-3">
         <TabsList>
           <TabsTrigger value="pending" data-testid="tab-pending">
             Pending ({pendingRequests.length})
@@ -101,7 +101,7 @@ export default function StockOut() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pending" className="space-y-4">
+        <TabsContent value="pending" className="space-y-3">
           {pendingRequests.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               No pending requests
@@ -119,7 +119,7 @@ export default function StockOut() {
           )}
         </TabsContent>
 
-        <TabsContent value="approved" className="space-y-4">
+        <TabsContent value="approved" className="space-y-3">
           {approvedRequests.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               No approved requests
@@ -131,7 +131,7 @@ export default function StockOut() {
           )}
         </TabsContent>
 
-        <TabsContent value="all" className="space-y-4">
+        <TabsContent value="all" className="space-y-3">
           {allRequests.map(request => (
             <RequestCard
               key={request.id}

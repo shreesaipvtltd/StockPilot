@@ -33,17 +33,17 @@ export function RequestCard({ request, onApprove, onReject, showActions = false 
 
   return (
     <Card data-testid={`card-request-${request.id}`}>
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-4">
+      <CardContent className="p-3">
+        <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <h4 className="font-semibold">{request.product}</h4>
+            <div className="flex items-center gap-2 mb-1.5">
+              <h4 className="font-semibold text-sm">{request.product}</h4>
               <Badge variant="outline" className={config.color}>
                 <StatusIcon className="h-3 w-3 mr-1" />
                 {config.label}
               </Badge>
             </div>
-            <div className="space-y-1 text-sm text-muted-foreground">
+            <div className="space-y-0.5 text-xs text-muted-foreground">
               <p>Requester: <span className="text-foreground">{request.requester}</span></p>
               <p>Quantity: <span className="text-foreground font-medium">{request.quantity} units</span></p>
               <p>Purpose: <span className="text-foreground">{request.purpose}</span></p>
@@ -53,7 +53,7 @@ export function RequestCard({ request, onApprove, onReject, showActions = false 
         </div>
         
         {showActions && request.status === "pending" && (
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-3">
             <Button
               size="sm"
               onClick={() => onApprove?.(request)}

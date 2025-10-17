@@ -12,8 +12,10 @@ export interface Product {
   category: string;
   vendor: string;
   quantity: number;
+  totalQuantity: number;
   reorderThreshold: number;
-  unitPrice: number;
+  costPrice: number;
+  sellingPrice: number;
 }
 
 interface ProductTableProps {
@@ -34,8 +36,8 @@ export function ProductTable({ products, onAdd, onEdit, onDelete }: ProductTable
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <CardTitle>Products</CardTitle>
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1 sm:w-64">
@@ -55,35 +57,41 @@ export function ProductTable({ products, onAdd, onEdit, onDelete }: ProductTable
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b text-left">
-                <th className="pb-3 text-sm font-medium text-muted-foreground">Product</th>
-                <th className="pb-3 text-sm font-medium text-muted-foreground">SKU</th>
-                <th className="pb-3 text-sm font-medium text-muted-foreground">Category</th>
-                <th className="pb-3 text-sm font-medium text-muted-foreground">Vendor</th>
-                <th className="pb-3 text-sm font-medium text-muted-foreground">Stock</th>
-                <th className="pb-3 text-sm font-medium text-muted-foreground">Price</th>
-                <th className="pb-3 text-sm font-medium text-muted-foreground">Actions</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">Product</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">SKU</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">Category</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">Vendor</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">Available</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">Total Qty</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">Cost Price</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">Selling Price</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">Stock Status</th>
+                <th className="px-4 py-2 text-xs font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredProducts.map((product) => (
-                <tr key={product.id} className="border-b last:border-0" data-testid={`row-product-${product.id}`}>
-                  <td className="py-3">
-                    <p className="font-medium">{product.name}</p>
+                <tr key={product.id} className="border-b last:border-0 hover-elevate" data-testid={`row-product-${product.id}`}>
+                  <td className="px-4 py-2">
+                    <p className="font-medium text-sm">{product.name}</p>
                   </td>
-                  <td className="py-3 text-sm text-muted-foreground">{product.sku}</td>
-                  <td className="py-3 text-sm">{product.category}</td>
-                  <td className="py-3 text-sm">{product.vendor}</td>
-                  <td className="py-3">
+                  <td className="px-4 py-2 text-xs text-muted-foreground">{product.sku}</td>
+                  <td className="px-4 py-2 text-xs">{product.category}</td>
+                  <td className="px-4 py-2 text-xs">{product.vendor}</td>
+                  <td className="px-4 py-2 text-sm font-medium">{product.quantity}</td>
+                  <td className="px-4 py-2 text-sm font-medium">{product.totalQuantity}</td>
+                  <td className="px-4 py-2 text-sm font-medium">${product.costPrice}</td>
+                  <td className="px-4 py-2 text-sm font-medium">${product.sellingPrice}</td>
+                  <td className="px-4 py-2">
                     <StockBadge quantity={product.quantity} reorderThreshold={product.reorderThreshold} />
                   </td>
-                  <td className="py-3 text-sm font-medium">${product.unitPrice}</td>
-                  <td className="py-3">
-                    <div className="flex gap-2">
+                  <td className="px-4 py-2">
+                    <div className="flex gap-1">
                       <Button
                         variant="ghost"
                         size="icon"

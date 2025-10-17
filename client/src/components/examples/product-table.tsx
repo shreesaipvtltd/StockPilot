@@ -8,8 +8,10 @@ const mockProducts: Product[] = [
     category: "Electronics",
     vendor: "Tech Supplies Co",
     quantity: 150,
+    totalQuantity: 200,
     reorderThreshold: 100,
-    unitPrice: 25.99,
+    costPrice: 18.99,
+    sellingPrice: 25.99,
   },
   {
     id: "2",
@@ -18,8 +20,10 @@ const mockProducts: Product[] = [
     category: "Accessories",
     vendor: "Cable World",
     quantity: 45,
+    totalQuantity: 150,
     reorderThreshold: 100,
-    unitPrice: 9.99,
+    costPrice: 5.99,
+    sellingPrice: 9.99,
   },
   {
     id: "3",
@@ -28,8 +32,10 @@ const mockProducts: Product[] = [
     category: "Furniture",
     vendor: "Office Plus",
     quantity: 5,
+    totalQuantity: 50,
     reorderThreshold: 50,
-    unitPrice: 49.99,
+    costPrice: 35.99,
+    sellingPrice: 49.99,
   },
 ];
 

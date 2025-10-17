@@ -12,7 +12,7 @@ const recentStockIns = [
 
 export default function StockIn() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">Stock In</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -20,25 +20,25 @@ export default function StockIn() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <div className="lg:col-span-2">
           <StockInForm onSubmit={(data) => console.log("Stock in submitted:", data)} />
         </div>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-2">
             <CardTitle className="text-base">Recent Stock Ins</CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[400px] pr-4">
-              <div className="space-y-4">
+            <ScrollArea className="h-[400px] pr-3">
+              <div className="space-y-3">
                 {recentStockIns.map((item) => (
-                  <div key={item.id} className="flex gap-3 pb-4 border-b last:border-0" data-testid={`stock-in-${item.id}`}>
-                    <div className="h-10 w-10 rounded-md bg-chart-2/10 flex items-center justify-center text-chart-2 flex-shrink-0">
-                      <ArrowDownToLine className="h-5 w-5" />
+                  <div key={item.id} className="flex gap-2 pb-3 border-b last:border-0" data-testid={`stock-in-${item.id}`}>
+                    <div className="h-8 w-8 rounded-md bg-chart-2/10 flex items-center justify-center text-chart-2 flex-shrink-0">
+                      <ArrowDownToLine className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{item.product}</p>
+                      <p className="font-medium text-xs">{item.product}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         +{item.quantity} units from {item.supplier}
                       </p>

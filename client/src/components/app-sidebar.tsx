@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, ArrowDownToLine, ArrowUpFromLine, FileText, Users, Settings } from "lucide-react";
+import { LayoutDashboard, Package, ArrowDownToLine, ArrowUpFromLine, FileText, Settings } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -43,12 +43,6 @@ const menuItems = [
     url: "/reports",
     icon: FileText,
     roles: ["admin", "manager"],
-  },
-  {
-    title: "Staff",
-    url: "/staff",
-    icon: Users,
-    roles: ["admin"],
   },
   {
     title: "Settings",
