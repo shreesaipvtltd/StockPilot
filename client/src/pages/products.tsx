@@ -1,85 +1,127 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { ProductTable, Product } from "@/components/product-table";
 import { ProductForm } from "@/components/product-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    name: "Wireless Mouse",
-    sku: "WM-001",
-    category: "Electronics",
-    vendor: "Tech Supplies Co",
-    quantity: 150,
-    totalQuantity: 200,
-    reorderThreshold: 100,
-    costPrice: 18.99,
-    sellingPrice: 25.99,
-  },
-  {
-    id: "2",
-    name: "USB Cable",
-    sku: "UC-002",
-    category: "Accessories",
-    vendor: "Cable World",
-    quantity: 45,
-    totalQuantity: 150,
-    reorderThreshold: 100,
-    costPrice: 5.99,
-    sellingPrice: 9.99,
-  },
-  {
-    id: "3",
-    name: "Laptop Stand",
-    sku: "LS-003",
-    category: "Furniture",
-    vendor: "Office Plus",
-    quantity: 5,
-    totalQuantity: 50,
-    reorderThreshold: 50,
-    costPrice: 35.99,
-    sellingPrice: 49.99,
-  },
-  {
-    id: "4",
-    name: "Mechanical Keyboard",
-    sku: "MK-004",
-    category: "Electronics",
-    vendor: "Tech Supplies Co",
-    quantity: 80,
-    totalQuantity: 120,
-    reorderThreshold: 50,
-    costPrice: 65.99,
-    sellingPrice: 89.99,
-  },
-  {
-    id: "5",
-    name: "Monitor Arm",
-    sku: "MA-005",
-    category: "Furniture",
-    vendor: "Office Plus",
-    quantity: 25,
-    totalQuantity: 60,
-    reorderThreshold: 30,
-    costPrice: 95.99,
-    sellingPrice: 129.99,
-  },
-  {
-    id: "6",
-    name: "HDMI Cable",
-    sku: "HC-006",
-    category: "Accessories",
-    vendor: "Cable World",
-    quantity: 200,
-    totalQuantity: 300,
-    reorderThreshold: 150,
-    costPrice: 8.99,
-    sellingPrice: 12.99,
-  },
-];
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 
 export default function Products() {
   const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const { toast } = useToast();
+
+  const { data: products, isLoading } = useQuery<Product[]>({
+    queryKey: ['/api/products'],
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await apiRequest("POST", "/api/products", {
+        name: data.name,
+        sku: data.sku,
+        category: data.category,
+        vendor: data.vendor,
+        quantity: parseInt(data.quantity),
+        totalQuantity: parseInt(data.totalQuantity),
+        reorderThreshold: parseInt(data.reorderThreshold),
+        costPrice: parseFloat(data.costPrice),
+        sellingPrice: parseFloat(data.sellingPrice),
+        description: data.description || null,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      toast({
+        title: "Success",
+        description: "Product created successfully",
+      });
+      setShowForm(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const res = await apiRequest("PUT", `/api/products/${id}`, {
+        name: data.name,
+        sku: data.sku,
+        category: data.category,
+        vendor: data.vendor,
+        quantity: parseInt(data.quantity),
+        totalQuantity: parseInt(data.totalQuantity),
+        reorderThreshold: parseInt(data.reorderThreshold),
+        costPrice: parseFloat(data.costPrice),
+        sellingPrice: parseFloat(data.sellingPrice),
+        description: data.description || null,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      toast({
+        title: "Success",
+        description: "Product updated successfully",
+      });
+      setShowForm(false);
+      setEditingProduct(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/products/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      toast({
+        title: "Success",
+        description: "Product deleted successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (data: any) => {
+    if (editingProduct) {
+      updateMutation.mutate({ id: editingProduct.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+    setShowForm(true);
+  };
+
+  const handleDelete = (product: Product) => {
+    if (confirm(`Are you sure you want to delete ${product.name}?`)) {
+      deleteMutation.mutate(product.id);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -90,24 +132,40 @@ export default function Products() {
         </p>
       </div>
 
-      <ProductTable
-        products={mockProducts}
-        onAdd={() => setShowForm(true)}
-        onEdit={(product) => console.log("Edit product", product)}
-        onDelete={(product) => console.log("Delete product", product)}
-      />
+      {isLoading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-12" />
+          <Skeleton className="h-64" />
+        </div>
+      ) : (
+        <ProductTable
+          products={products || []}
+          onAdd={() => {
+            setEditingProduct(null);
+            setShowForm(true);
+          }}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      )}
 
-      <Dialog open={showForm} onOpenChange={setShowForm}>
+      <Dialog open={showForm} onOpenChange={(open) => {
+        setShowForm(open);
+        if (!open) setEditingProduct(null);
+      }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add New Product</DialogTitle>
+            <DialogTitle>
+              {editingProduct ? "Edit Product" : "Add New Product"}
+            </DialogTitle>
           </DialogHeader>
           <ProductForm
-            onSubmit={(data) => {
-              console.log("Product added:", data);
+            initialData={editingProduct || undefined}
+            onSubmit={handleSubmit}
+            onCancel={() => {
               setShowForm(false);
+              setEditingProduct(null);
             }}
-            onCancel={() => setShowForm(false)}
           />
         </DialogContent>
       </Dialog>

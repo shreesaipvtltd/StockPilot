@@ -7,22 +7,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 
 interface ProductFormProps {
+  initialData?: any;
   onSubmit?: (data: any) => void;
   onCancel?: () => void;
 }
 
-export function ProductForm({ onSubmit, onCancel }: ProductFormProps) {
+export function ProductForm({ initialData, onSubmit, onCancel }: ProductFormProps) {
   const [formData, setFormData] = useState({
-    name: "",
-    sku: "",
-    category: "",
-    vendor: "",
-    quantity: "",
-    totalQuantity: "",
-    reorderThreshold: "",
-    costPrice: "",
-    sellingPrice: "",
-    description: "",
+    name: initialData?.name || "",
+    sku: initialData?.sku || "",
+    category: initialData?.category || "",
+    vendor: initialData?.vendor || "",
+    quantity: initialData?.quantity?.toString() || "",
+    totalQuantity: initialData?.totalQuantity?.toString() || "",
+    reorderThreshold: initialData?.reorderThreshold?.toString() || "",
+    costPrice: initialData?.costPrice?.toString() || "",
+    sellingPrice: initialData?.sellingPrice?.toString() || "",
+    description: initialData?.description || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
